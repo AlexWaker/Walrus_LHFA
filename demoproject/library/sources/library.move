@@ -19,11 +19,12 @@ module library::library {
         fields: vector<String>,
     }
 
-    public struct Library has key, store {
+    public struct Library has key, store {  // 这应该是一个nft
         id: UID,
         name: String,
         image_url: String,
         all_issues: vector<String>, //保存该目录下所有issue的id
+        creator: 
     }
 
     public struct Comment has key { //每隔24小时整理一份该文章下新增的评论，自动存成pdf并保存在walrus上

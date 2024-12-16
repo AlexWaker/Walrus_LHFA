@@ -3,8 +3,50 @@ import { Link } from 'react-router-dom';
 import { ConnectButton } from '@mysten/dapp-kit';
 import { Box } from '@radix-ui/themes';
 import './MainPage.css';
+import { useState } from 'react';
+import { useCurrentWallet, useCurrentAccount } from '@mysten/dapp-kit';
+import { useNavigate } from 'react-router-dom';
+import Header from './Header';
+
 
 const MainPage: React.FC = () => {
+
+  const navigate = useNavigate();
+  const { currentWallet, connectionStatus } = useCurrentWallet();
+  const nowaccount = useCurrentAccount();
+  // 这是钩子的标准写法，
+  // const [state, setState] = useState(initialValue);
+  // state 是状态，setState 是设置状态的函数
+  // initialValue 是初始值
+  // setState 用法：setState(newState)，将state设置为newState，就这么简单，就是一个简单的赋值
+  const isWalletConnected = () => {
+    if (connectionStatus == 'disconnected') { //=赋值   ==相等   ===严格相等
+      return false;
+    }
+    return true;
+  };
+
+  const getWalletAddress = () => {
+    return nowaccount?.address; //？是ts属性，表示可能为空
+  };
+
+  const handleImageClick = (id: string) => {
+    if (isWalletConnected()) {
+      navigate(`/${id}`); // 跳转到对应的页面
+    } else {
+      alert('Please connect your wallet first');
+    }
+  };
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isWalletConnected()) {
+      const file = event.target.files?.[0];
+      if (file) {
+        console.log('Uploaded file:', file.name); // 这里可以处理上传的文件
+      }
+    } else {
+      alert('Please connect your wallet first');
+    }
+  };
   const images = [
     {
       id: 'john-von-neumann',
@@ -57,18 +99,31 @@ const MainPage: React.FC = () => {
   ];
   
   return (
-    <Box className="app">
-      <header className="header">
+    <Box className="allMainPage">
+      {/* <header className="header">
         <Box className="logo">LHFA</Box>
-        <nav className="nav">
-          <a href="#">Home</a>
-          <a href="#">About</a>
-          <a href="#">Contact</a>
-        </nav>
-        <Box className="buttons">
+        <Box className="upload_buttons" style={{ display: 'flex', alignItems: 'center' }}>
+          <button
+            onClick={() => setShowModal(true)} // 点击按钮显示弹窗
+            style={{
+              padding: '10px 20px',
+              fontSize: '15px',
+              backgroundColor: '#007BFF',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              marginRight: '20px',
+            }}
+          >
+            Upload your issue
+          </button>
+        </Box>
+        <Box className="connect_buttons">
           <ConnectButton />
         </Box>
-      </header>
+      </header> */}
+      <Header />
       <Box className="main">
         <Box className="main-title" style={{ marginTop: '0' }}>
           <h1>Welcome to the Library of Human Freedom Academy</h1>
@@ -94,14 +149,13 @@ const MainPage: React.FC = () => {
         <Box className="image-gallery" style={{ width: '80%', display: 'flex', flexWrap: 'wrap', marginTop: '30px' }}>
           {images.map((image) => (
             <Box key={image.id} style={{ flex: '1 0 21%', margin: '10px' }}>
-              <Link to={`/image-detail/${image.id}`}>
-                <img
-                  src={image.url}
+              <img
+                src={image.url}
                 alt="Image 1"
                 style={{ width: '100%', borderRadius: '10px' }}
+                onClick={() => handleImageClick(image.id)}
               />
-            </Link>
-          </Box>
+            </Box>
           ))}
         </Box>
       </Box>
@@ -110,6 +164,9 @@ const MainPage: React.FC = () => {
           <p>&copy; 2024 My Website. All rights reserved.</p>
         </footer>
       </Box>
+      {/* 弹窗 */}
+
+
     </Box>
   );
 };
